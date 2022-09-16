@@ -3,6 +3,7 @@ using CsvHelper;
 using Microsoft.AspNetCore.Mvc;
 using RestaurentProject.Data;
 using RestaurentProject.Mapper;
+using RestaurentProject.Services;
 using RestaurentProject.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -18,16 +19,17 @@ namespace RestaurentProject.Controllers
     {
         private readonly RestaurantDbContext _context;
         private readonly IMapper _mapper2;
+        private readonly IMethods _methods;
 
-        public CsvController(RestaurantDbContext context , IMapper mapper )
+        public CsvController(RestaurantDbContext context , IMapper mapper ,IMethods methods)
         {
 
             _context = context;
             _mapper2 = mapper;
-
+            _methods = methods;
         }
         [HttpGet]
-        public IActionResult SaveFile()
+        public IActionResult SaveFileView()
         {
 
             var data = _context.ExportData.ToList();
@@ -38,6 +40,18 @@ namespace RestaurentProject.Controllers
             using (var csv = new CsvWriter(writer, CultureInfo.InstalledUICulture))
             {
                 csv.WriteRecords(modelView);
+            }
+            return Ok();
+        }
+        [HttpGet("SaveFile")]
+        public IActionResult SaveFile()
+        {
+
+            var data = _methods.GetCsvData().ToArray();
+            using (var writer = new StreamWriter(@"C:\Users\DiaaAldin\Desktop\RestorantData.csv"))
+            using (var csv = new CsvWriter(writer, CultureInfo.InstalledUICulture))
+            {
+                csv.WriteRecords(data);
             }
             return Ok();
         }

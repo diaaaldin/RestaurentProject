@@ -34,43 +34,44 @@ namespace RestaurentProject.Controllers
             var res = _context.CustomerMenus.ToList();
             return Ok(res);
         }
+        [HttpPost("UpdateOrder")]
+        public IActionResult UpdateOrder(int idCustomer, int idMenu, [FromBody] OrderViewModel order)
+        {
+            var chick = _context.CustomerMenus.Find(idCustomer, idMenu);
 
-        //public IActionResult UpdateOrder(int idCustomer,int idMenu ,[FromBody] OrderViewModel order)
-        //{
-        //    var chick = _context.CustomerMenus.Find(idCustomer, idMenu);
+            if (chick == null)
+            {
+                return BadRequest();
+            }
 
-        //    if (chick == null)
-        //    {
-        //        return BadRequest();
-        //    }
+            _context.CustomerMenus.Remove(chick);
+            _context.SaveChanges();
 
-        //    _context.CustomerMenus.Remove(chick);
-            
-        //    // to add quantity +1 
-        //    var chickMenu = _context.RestaurentMenus.FirstOrDefault(x => x.Id == order.MenuId);
-        //    var MenuDeleted = _context.RestaurentMenus.FirstOrDefault(x => x.Id == chick.RestaurentMenuId);
-        //    MenuDeleted.Quantity++;
-            
-        //    // add new order
-        //    bool avaliability = _methods.IsAvaliable(chickMenu.Id);
+            // to add quantity +1 
+            var chickMenu = _context.RestaurentMenus.FirstOrDefault(x => x.Id == order.MenuId);
+            var MenuDeleted = _context.RestaurentMenus.FirstOrDefault(x => x.Id == chick.RestaurentMenuId);
+            MenuDeleted.Quantity++;
 
-        //    if (avaliability == true)
-        //    {
-        //        var res = new CustomerMenu
-        //        {
-        //            CustomerId = order.CustomerId,
-        //            RestaurentMenuId = order.MenuId
-        //        };
-        //        _context.CustomerMenus.Add(res);
-        //        chickMenu.Quantity--;
-        //        _context.SaveChanges();
-        //        return Ok(res);
-        //    }
-        //    else
-        //    {
-        //        return BadRequest("Not Avaliable");
-        //    }
-        //}
+            // add new order
+            bool avaliability = _methods.IsAvaliable(chickMenu.Id);
+
+            if (avaliability == true)
+            {
+                var res = new CustomerMenu
+                {
+                    CustomerId = order.CustomerId,
+                    RestaurentMenuId = order.MenuId
+                };
+                _context.CustomerMenus.Add(res);
+                chickMenu.Quantity--;
+                _context.SaveChanges();
+                return Ok(res);
+            }
+            else
+            {
+                return BadRequest("Not Avaliable");
+            }
+        }
 
 
         [HttpPost]
